@@ -1,0 +1,77 @@
+{
+  "brand": "Receipt Audit Network",
+  "networks": [
+    {
+      "name": "receipt_audit",
+      "front_man": "receipt_auditor",
+      "hocon": "./receipt_audit.network.json",
+      "description": "Audits a receipt's line items: repeated lines, the gap between the items and the printed total, and the amount plausibly overcharged.",
+      "tags": [
+        "agentified-website"
+      ],
+      "sample_queries": [
+        "Rice 39.90, milk 45.00, eggs 18.50, eggs 18.50, tomatoes 6.60. The total says 128.50. Was I overcharged?",
+        "My receipt says 2 x 18.50 for the same eggs twice, and the total is 130.50. Check it.",
+        "Show me the report for these lines so I can read it myself.",
+        "Is 45 yuan a fair price for 12 cartons of milk?"
+      ]
+    }
+  ],
+  "llm_router": {
+    "base_url": "https://api.otari.ai/api/v1",
+    "mock": false,
+    "byok_router": "https://api.otari.ai/api/v1"
+  },
+  "allowed_peers": [],
+  "peer_policy": {
+    "mode": "closed",
+    "deny_origins": [],
+    "note": "Local agents and the page's own actions only. No peer site is called."
+  },
+  "agent_mcp": {
+    "protocol": "nsdeploy-agent-mcp/v1",
+    "network": "receipt_audit",
+    "front_man": "receipt_auditor",
+    "available": false,
+    "reason": "This is a static bundle; a public MCP facade requires an application host."
+  },
+  "theme": {
+    "primary": "#1b4d3e"
+  },
+  "linking": {
+    "protocol": "nsdeploy-link/v1",
+    "exports": [
+      {
+        "network": "receipt_audit",
+        "front_man": "receipt_auditor",
+        "aliases": [
+          "receipt_audit",
+          "receipt_auditor"
+        ],
+        "url": "receipt_audit"
+      }
+    ],
+    "imports": [],
+    "link_updates": {
+      "mode": "browser-local"
+    }
+  },
+  "deployment": {
+    "mode": "static",
+    "self_contained_runtime": true,
+    "browser_mock": false,
+    "direct_byok": true,
+    "direct_mcp_requires_cors": true,
+    "public_mcp_facade": false
+  },
+  "actions": {
+    "version": 1,
+    "module": "./site-actions.js",
+    "bridge": "./bridge/action-bridge.html",
+    "agentTools": [
+      "read_site",
+      "audit_receipt",
+      "show_audit"
+    ]
+  }
+}

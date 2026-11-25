@@ -1,0 +1,18 @@
+{
+  "protocol": "nsdeploy-link/v1",
+  "exports": [
+    {
+      "network": "receipt_audit",
+      "front_man": "receipt_auditor",
+      "aliases": [
+        "receipt_audit",
+        "receipt_auditor"
+      ],
+      "url": "receipt_audit"
+    }
+  ],
+  "imports": [],
+  "link_updates": {
+    "mode": "browser-local"
+  }
+}

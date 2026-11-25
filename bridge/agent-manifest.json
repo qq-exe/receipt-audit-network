@@ -1,0 +1,11 @@
+{
+  "networks": [
+    {
+      "name": "receipt_audit"
+    }
+  ],
+  "actions": {
+    "version": 1,
+    "module": "./bridge-actions.js"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "protocol": "nsdeploy-agent-mcp/v1",
+  "network": "receipt_audit",
+  "front_man": "receipt_auditor",
+  "available": false,
+  "reason": "This is a static bundle; a public MCP facade requires an application host."
+}

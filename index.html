@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Receipt Audit Network — a grounded capability for agents</title>
+<meta name="description" content="An open agentic website that publishes one exact capability: audit a receipt's line items for duplicate charges and total mismatches. Plain arithmetic, callable by any agent.">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="assistant.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23111'/%3E%3Cpath d='M9 8h14v3H9zm0 6h14v3H9zm0 6h9v3H9z' fill='%23fff'/%3E%3C/svg%3E">
+<script type="module" src="js/app.js"></script>
+<script type="module" src="site.js"></script>
+</head>
+<body>
+
+<header class="top">
+  <a class="brand" href="./">
+    <span class="dot" aria-hidden="true"></span>
+    Receipt Audit Network
+  </a>
+  <nav class="top-nav">
+    <a href="#tool">Try it</a>
+    <a href="#capability">Capability</a>
+    <a href="#assistant">Assistant</a>
+    <a href="agent-manifest.json">Manifest</a>
+  </nav>
+</header>
+
+<main>
+
+  <section class="hero">
+    <p class="eyebrow">Open agentic website · one grounded capability</p>
+    <h1>Receipts are checked by arithmetic,<br>not by opinion.</h1>
+    <p class="lede">
+      This site publishes a single capability any agent can call: given a receipt's line items,
+      it returns the duplicate charges and the gap between the printed total and what the items
+      actually add up to. Every number is plain code, so the answer can be re-checked by anyone.
+      It never estimates what a price <em>should</em> have been.
+    </p>
+    <div class="cta">
+      <a class="btn primary" href="#tool">Audit a receipt</a>
+      <a class="btn ghost" href="#capability">See the capability</a>
+    </div>
+  </section>
+
+  <section id="tool" class="panel">
+    <div class="panel-head">
+      <h2>Audit a receipt</h2>
+      <p class="hint">Paste the item lines. One line per item, with the amount at the end.</p>
+    </div>
+
+    <div class="grid">
+      <form id="audit-form" class="col-input">
+        <label for="receipt-text">Receipt text</label>
+        <textarea id="receipt-text" rows="12" spellcheck="false"></textarea>
+        <div class="row-actions">
+          <button class="btn primary" type="submit">Audit</button>
+          <button class="btn ghost" type="button" id="load-sample">Load sample</button>
+        </div>
+      </form>
+
+      <div class="col-output">
+        <div id="result" class="result">
+          <div class="empty">
+            <strong>Nothing to audit yet.</strong>
+            <span>Paste a receipt and press Audit.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="capability" class="panel">
+    <div class="panel-head">
+      <h2>The capability</h2>
+      <p class="hint">
+        Declared in <a href="agent-manifest.json">agent-manifest.json</a> and
+        <a href="receipt_audit.network.json">receipt_audit.network.json</a>.
+        It runs in your browser; no server sees the data.
+      </p>
+    </div>
+
+    <div class="grid-3">
+      <div class="card">
+        <h3><code>audit_receipt</code></h3>
+        <p>Input: the line items and, if printed, the total. Output: duplicates, item sum, printed total, difference, suspect overcharge.</p>
+        <p class="tag read">read · no state change</p>
+      </div>
+      <div class="card">
+        <h3><code>show_audit</code></h3>
+        <p>Runs the same audit and puts the report on this page, so a visitor can see what the agent just did.</p>
+        <p class="tag write">write · visible, undoable</p>
+      </div>
+      <div class="card">
+        <h3><code>read_site</code></h3>
+        <p>Returns what this site supports and what it refuses, so an agent does not promise a check that does not exist.</p>
+        <p class="tag read">read · no state change</p>
+      </div>
+    </div>
+
+    <details class="json-demo">
+      <summary>Send the capability a request (same JSON an agent sends)</summary>
+      <form id="json-form">
+        <label for="json-input">JSON request</label>
+        <textarea id="json-input" rows="12" spellcheck="false">{
+  "items": [
+    { "name": "Fragrant Rice 5kg", "qty": 1, "unit_price": 39.90, "amount": 39.90 },
+    { "name": "Pure Milk 250mlx12", "qty": 1, "unit_price": 45.00, "amount": 45.00 },
+    { "name": "Eggs 30-pack", "qty": 1, "unit_price": 18.50, "amount": 18.50 },
+    { "name": "Eggs 30-pack", "qty": 1, "unit_price": 18.50, "amount": 18.50 },
+    { "name": "Tomatoes 500g", "qty": 1, "unit_price": 6.60, "amount": 6.60 }
+  ],
+  "printed_total": 128.50,
+  "currency": "CNY"
+}</textarea>
+        <div class="row-actions">
+          <button class="btn primary" type="submit">Run capability</button>
+          <span id="json-msg" class="hint" role="status"></span>
+        </div>
+      </form>
+    </details>
+
+    <p class="limits">
+      <strong>What it will not do:</strong> estimate a fair price, infer tax, read a photo,
+      contact a merchant, or tell you whether to dispute a charge. Those need data or authority
+      this site does not have.
+    </p>
+  </section>
+
+  <section id="assistant" class="assistant" aria-labelledby="assistant-heading">
+    <h2 id="assistant-heading">Ask this site</h2>
+    <p>Ask for an audit in words, or tell it what to check. It calls the same capability the page uses.</p>
+    <p class="assistant-note">Your messages and the page data it reads go to the LLM provider you choose in the settings below, using your own key. Nothing is sent until you add a key.</p>
+    <p id="assistant-status" role="status">Connecting the assistant… If this message stays, the assistant could not load. You can still use the page directly.</p>
+    <div id="agent-app">
+      <div data-ns-slot="header"></div>
+      <div class="assistant-panels">
+        <div data-ns-slot="chat"></div>
+        <div data-ns-slot="agents"></div>
+      </div>
+      <div data-ns-slot="settings"></div>
+    </div>
+  </section>
+
+  <section class="panel about">
+    <h2>Why a capability and not an app</h2>
+    <p>
+      A receipt audit is exact work: the answer is either right or wrong, and a language model
+      has no better claim on it than arithmetic does. So the useful thing to publish is the
+      check itself, as a typed capability other agents can call when they need a number verified.
+      The chat on this page is one caller; another site's agent is another.
+    </p>
+    <p>
+      This site follows the
+      <a href="https://github.com/cognizant-ai-labs/agentic-web/blob/main/docs/worldwide_agentic_web_mvp_spec.md">Worldwide Agentic Web MVP profile</a>:
+      a public network descriptor, a browser runtime, typed capabilities with declared effects,
+      and no server holding your data.
+    </p>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <div>
+    <strong>Receipt Audit Network</strong>
+    <span>Open source · MIT</span>
+  </div>
+  <nav>
+    <a href="agent-manifest.json">agent-manifest.json</a>
+    <a href="links.json">links.json</a>
+    <a href="https://github.com/qq-exe">GitHub</a>
+  </nav>
+</footer>
+
+</body>
+</html>
